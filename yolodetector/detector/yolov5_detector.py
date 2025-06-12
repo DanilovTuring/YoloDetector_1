@@ -21,10 +21,19 @@ class YOLOv5Detector (BaseDetector):
     def detect(self, imageL: Any) -> List[Tuple[str, float, Tuple[int, int, int, int ]]]:
        
       """
-      Este método detectará objetos en la imagen y devolverá resultados con etiquetas.
-      Lo implementaremos paso a paso más adelante.
+      Detecta objetos en una imagen y devuelve una lista con:
+      (nombre_clase, confianza, caja).
       """
-      pass  
+      predicciones = self.predict(image)
+      output = []
+      for class_id, confidence, box in predicciones:
+          label = self.model.names[class_id]
+          output.append(label, confidence, box)
+
+      return output
+         
+
+      
 
     def predict(self, image: Any ) -> List[Tuple[int, float, Tuple[int,int,int,int]]]:
    
