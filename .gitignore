@@ -11,3 +11,7 @@ __pycache__/
 # Archivos de sistema 
 Thumbs.db
 .DS_Store
+
+# Ignorar el modelo YOLOv5 y muestras locales
+resources/model/
+resources/samples/
