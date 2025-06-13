@@ -62,7 +62,7 @@ class YOLOv5Detector (BaseDetector):
         annotated_image = draw_boxes(image.copy(), detections)
         return annotated_image
 
-    def predict(self, image: Any ) -> List[Tuple[int, float, Tuple[int,int,int,int]]]:
+    def predict(self, image: Any ) -> List[Tuple[int, str, float, Tuple[int,int,int,int]]]:
    
         """
         Realiza la detección de objetos en una imagen usando el modelo YOLv5.
@@ -88,10 +88,11 @@ class YOLOv5Detector (BaseDetector):
             class_id = int(row['class'])
             confidence = float(row['confidence'])
             box = (int(row['xmin']), int(row['ymin']), int(row['xmax']), int(row['ymax']))
-            output.append((class_id, confidence, box))
+            name = self.model.names[class_id]
+            output.append((class_id, name, confidence, box))
 
         return output 
-
+        
     def __str__(self) -> str:
         """
         Devuelve la representacion legible del lector
