@@ -93,9 +93,9 @@ class YOLOv5Detector (BaseDetector):
         Devuelve la representacion legible del lector
         """    
                
-        model_name = str(MODEL_PATH).split("/")[-1]
+        model_name = Path(MODEL_PATH).name
         num_classes = len(self.model.names)
-        return f"YOLOv5DETECTOR(model='{model_name}', devide = '{self.device}', classes={num_classes})"
+        return f"YOLOv5DETECTOR(model='{model_name}', device = '{self.device}', classes={num_classes})"
     
 
     

@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import torch
+from typing import List, Tuple, Any
 
 
 def preprocess_image(image: np.ndarray) -> torch.Tensor:
@@ -27,3 +28,12 @@ def preprocess_image(image: np.ndarray) -> torch.Tensor:
     tensor_image = tensor_image.unsqueeze(0)
 
     return tensor_image
+
+def draw_boxes(image: Any, detections: List[Tuple[str, float, Tuple[int,int,int,int]]]) -> Any:
+    image_with_boxes = image.copy()
+    for label, confidence, box in detections:
+        x1, y1, x2, y2 = box
+        cv2.rectangle(image_with_boxes, (x1,y1 - 10), cv2.FONT_HERSHEY_SIMPLEX,
+                      0.5, (0, 255, 0), 2)
+        
+    return image_with_boxes
