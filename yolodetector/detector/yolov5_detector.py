@@ -9,7 +9,7 @@ from typing import List, Tuple, Any
 import numpy as np
 
 from yolodetector.detector.base import BaseDetector
-from yolodetector.config.setting import MODEL_PATH, DEVICE
+from yolodetector.config.setting import MODEL_PATH, DEVICE, CONFIDENCE_THRESHOLD
 from yolodetector.utils.image_utils import preprocess_image, draw_boxes
 
 class YOLOv5Detector (BaseDetector):
