@@ -6,7 +6,10 @@ from pathlib import Path
 from typing import List, Tuple, Any
 
 
+
 import numpy as np
+
+import pandas as pd
 
 from yolodetector.detector.base import BaseDetector
 from yolodetector.config.setting import MODEL_PATH, DEVICE, CONFIDENCE_THRESHOLD
@@ -75,7 +78,8 @@ class YOLOv5Detector (BaseDetector):
         results = self.model(preprocessed)
 
         #3. Obtener las predicciones como DataFrame de pandas
-        predictions = results.xyxy[0]  # columnas: xmin, ymin, ymin xmax, ymax, confidence, class, name
+        predictions = pd.DataFrame(results.xyxy[0].cpu().numpy(), columns =
+                                   ["xmin", "ymin", "xmax", "ymax", "confidence", "class"])  # columnas: xmin, ymin, xmax, ymax, confidence, class, name
 
         #4. Convertir a lista de tuplas
         output = []
