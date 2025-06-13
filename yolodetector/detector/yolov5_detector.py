@@ -75,10 +75,11 @@ class YOLOv5Detector (BaseDetector):
         preprocessed = preprocess_image(image)
 
         #2. Realizar la inferencia con el modelo
-        results = self.model(preprocessed)
-
+        results = self.model(preprocessed)[0]
+        
         #3. Obtener las predicciones como DataFrame de pandas
-        predictions = pd.DataFrame(results.xyxy[0].cpu().numpy(), columns =
+        detections = results[:, :6].cpu().numpy()
+        predictions = pd.DataFrame(results[0].cpu().numpy(), columns =
                                    ["xmin", "ymin", "xmax", "ymax", "confidence", "class"])  # columnas: xmin, ymin, xmax, ymax, confidence, class, name
 
         #4. Convertir a lista de tuplas
