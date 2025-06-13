@@ -75,7 +75,7 @@ class YOLOv5Detector (BaseDetector):
         results = self.model(preprocessed)
 
         #3. Obtener las predicciones como DataFrame de pandas
-        predictions = results.pandas().xyxy[0]  # columnas: xmin, ymin, ymin xmax, ymax, confidence, class, name
+        predictions = results.xyxy[0]  # columnas: xmin, ymin, ymin xmax, ymax, confidence, class, name
 
         #4. Convertir a lista de tuplas
         output = []
