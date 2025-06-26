@@ -17,11 +17,30 @@ from yolodetector.utils.image_utils import preprocess_image, draw_boxes
 
 class YOLOv5Detector (BaseDetector):
     
-    def __init__(self, model_path: str =  MODEL_PATH, device: str = DEVICE):
+    def __init__(self, model_path: str =  MODEL_PATH, device: str = DEVICE, condifedence_threshold: float = CONFIDENCE_THRESHOLD):
+        """
+        Inicializa el detector
+
+        Args: 
+            model_path: Ruta dal modelo personalizado (.pt)
+            device: Dispositivo para inferencia ('cpu' o 'cuda')
+            confidence_thresgold: Umbral minímo de confianza
+        """
+        
         self.device= device
-        self.model= torch.hub.load('ultralytics/yolov5', 'custom', path=model_path)
-        self.model.to(self.device)
-        self.model.eval()
+        self.confidence_threshold = condifedence_threshold
+        try:
+
+            self.model= torch.hub.load('ultralytics/yolov5', 'custom', path=model_path, autoshape = True)
+            self.model.to(self.device)
+            self.model.eval()
+            self.model.conf = condifedence_threshold 
+
+        except Exception as e:
+            raise RuntimeError(f"Error al cargar el Modelo Yolov5: {str(e)}")
+        
+
+
  
 
     def detect(self, image: Any) -> List[Tuple[str, float, Tuple[int, int, int, int ]]]:
