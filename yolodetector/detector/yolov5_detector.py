@@ -19,24 +19,24 @@ from yolodetector.utils.image_utils import preprocess_image, draw_boxes
 
 class YOLOv5Detector (BaseDetector):
     
-    def __init__(self, model_path: str =  MODEL_PATH, device: str = DEVICE, condifedence_threshold: float = CONFIDENCE_THRESHOLD):
+    def __init__(self, model_path: str =  MODEL_PATH, device: str = DEVICE, confidence_threshold: float = CONFIDENCE_THRESHOLD):
         """
         Inicializa el detector
 
         Args: 
             model_path: Ruta dal modelo personalizado (.pt)
             device: Dispositivo para inferencia ('cpu' o 'cuda')
-            confidence_thresgold: Umbral minímo de confianza
+            confidence_threshold: Umbral minímo de confianza
         """
         
         self.device= device
-        self.confidence_threshold = condifedence_threshold
+        self.confidence_threshold = confidence_threshold
         try:
 
             self.model= torch.hub.load('ultralytics/yolov5', 'custom', path=model_path, autoshape = True)
             self.model.to(self.device)
             self.model.eval()
-            self.model.conf = condifedence_threshold 
+            self.model.conf = confidence_threshold 
 
         except Exception as e:
             raise RuntimeError(f"Error al cargar el Modelo Yolov5: {str(e)}")
@@ -56,7 +56,7 @@ class YOLOv5Detector (BaseDetector):
 
             
         Returns:
-            Lista de tuplas (nombre_clase, confianza, )
+            Lista de tuplas (nombre_clase, confianza, bounding_box )
         """
 
 
@@ -73,7 +73,7 @@ class YOLOv5Detector (BaseDetector):
        Dibuja las detecciones sobre la imagen original.
 
        Args:
-            image: Imageen original (np.array)
+            image: Imagen original (np.array)
             detections: Lista de detecciones (label, confidence, bounding box)
        
         Returns:
@@ -98,7 +98,7 @@ class YOLOv5Detector (BaseDetector):
             image: La imagen de entrada
 
             Returns:
-                Lista de tu´las (class_id, label, confidence, bounding_box)
+                Lista de tuplas (class_id, label, confidence, bounding_box)
         """
 
         if isinstance(image, str): #Si es path carga la imagen
@@ -127,8 +127,8 @@ class YOLOv5Detector (BaseDetector):
                 try:
                     cls_id = int(cls_id)
                     conf = float(conf)
-                    label = self.model.names.get(cls_id, f"Unknown_{cls_id}")
-                    box = tuple(map(int,[xmin, ymin, conf, box]))
+                    label = self.model.names.get(cls_id, f"unknown_{cls_id}")
+                    box = tuple(map(int,[xmin, ymin, xmax, ymax]))
                     output.append((cls_id, label, conf, box))
 
 
@@ -141,7 +141,7 @@ class YOLOv5Detector (BaseDetector):
         """
          Representacion legible del detector
         """     
-        model_name = Path(self.model.weigths.name if hasattr(self.model, 'weigths') else MODEL_PATH).name
+        model_name = Path(self.model.weights.name if hasattr(self.model, 'weights') else MODEL_PATH).name
         num_classes = len(self.model.names)
         return (f"YOLOv5DETECTOR(model='{model_name}', device = '{self.device}', " 
                 f"clases={num_classes}, conf_thresh={self.confidence_threshold})")
