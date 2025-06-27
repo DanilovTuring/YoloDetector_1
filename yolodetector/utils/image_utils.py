@@ -98,3 +98,21 @@ def draw_boxes(
                 cv2.LINE_AA
             )
     return annotated_img
+
+def load_image(image_path: str) -> np.ndarray:
+
+    """
+    Carga una imagen desde disco con validación
+
+    Args:
+        image_path: Ruta de la imagen
+    
+    Returns:
+        Imagen en formato BRG (OpenCV)
+
+    """
+
+    img = cv2.imread(image_path)
+    if img is None:
+        raise FileNotFoundError(f"No se pudo cargar la imagen: {image_path}")
+    return img
