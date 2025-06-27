@@ -2,7 +2,7 @@ import sys
 import os
 import cv2
 
-#Configuracion - Añade el directorio raíz al path
+#Configuración - Añade el directorio raíz al path
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
@@ -14,7 +14,7 @@ try:
 except ImportError as e:
     print(f"Error de importación: {str(e)}")
     print(f"Verifique si la estructura de directorios es correcta:")
-    print("- El directiorio 'yolodetector' debe estar en la raiz del proyecto")
+    print("- El directorio 'yolodetector' debe estar en la raiz del proyecto")
     print("- Debe contener los archivos __init__.py necesarios")
     sys.exit(1)
 
@@ -22,12 +22,12 @@ def main():
     try:
         # Configura paths absolutos
         resources_dir = os.path.join(project_root, 'resources')
-        input_path = os.path.join(resources_dir, 'outputs', 'zinedine.jpg')
+        input_path = os.path.join(resources_dir, 'samples', 'zinedine.jpg')
         output_path = os.path.join(resources_dir, 'outputs', 'zinedine_output.jpg')
 
         #Cargar imagen
         image = load_image(input_path)
-        print(f"imagen cargada: {input_path}")
+        print(f"Imagen cargada: {input_path}")
 
         # Inicializar detector
         detector = YOLOv5Detector()
@@ -49,7 +49,7 @@ def main():
         print(f"Resultados guardados en: {output_path}")
     
     except Exception as e:
-        print(f"Error durante la ejecición: {str(e)}")
+        print(f"Error durante la ejecución: {str(e)}")
         sys.exit(1)
         
 if __name__ == "__main__":
