@@ -4,30 +4,43 @@ import torch
 from typing import List, Tuple, Any
 
 
-def preprocess_image(image: np.ndarray) -> torch.Tensor:
+def preprocess_image(image: np.ndarray, target_size: int = 640) -> torch.Tensor:
     """
-    Convierte una imagen OpenCv en un tensor compatible para el modelo
+    Preprocesa una imagen para YOLOv5 manteniendo el aspecto ratio
 
-    :param image: Imagen en formato BGR(OpenCv)
-    return: Tensor listo para la inferencia (1,2,H,W)
+    Args:
+        image: Imagen de entrada en formato BGR (OpenCV)
+        target_size: Tamaño del objetivo para el resize (default:640)
+
+    Returns:
+        Tensor de PyTorch normalizado en formato (1, 3, H, W)
+
     """
 
-    # 1. Convertimos de BGR (OpenCv) a RGB (FORMATO PARA YOLOv5)
+    # Convertimos de BGR (OpenCv) a RGB (FORMATO PARA YOLOv5)
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    # 2. Redimensionamos el tama;o 
-    resized = cv2.resize(image_rgb, (640, 640))
+    # Obtener las dimensiones originales
+    h, w = image_rgb[:2]
 
-    # 3. Normalizamos los píxe;es a rango [0, 1]
-    normalized = resized / 255.0
+    # Calcular escala manteniendo aspecto ratio
+    scale = min(target_size / h, target_size / w)
+    new_h, new_w = int(h * scale), int(w * scale)
 
-    # 4. Transponemos a forma (C, H, W) y convertimos a tipo float32
+    # Redimensionamos el tamaño 
+    resized = cv2.resize(image_rgb, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
+
+    # Crear canvas cuadrado
+    canvas = np.zeros((target_size, target_size, 3), dtype=np.uint8)
+    canvas[:new_h, new_w] = resized
+
+    # Normalizamos y convertimos a tensor
+    normalized = canvas.astype(np.float32 / 255.0)
     tensor_image = torch.from_numpy(normalized).permute(2, 0, 1).float()
+    
+    return tensor_image.unsqueeze(0)
 
-    # 5. Agregamos una dimension extra para el batch (1 imagen)
-    tensor_image = tensor_image.unsqueeze(0)
-
-    return tensor_image
+    
 
 def draw_boxes(image: Any, detections: List[Tuple[str, float, Tuple[int,int,int,int]]]) -> Any:
     image_with_boxes = image.copy()
