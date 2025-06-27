@@ -37,16 +37,64 @@ def preprocess_image(image: np.ndarray, target_size: int = 640) -> torch.Tensor:
     # Normalizamos y convertimos a tensor
     normalized = canvas.astype(np.float32 / 255.0)
     tensor_image = torch.from_numpy(normalized).permute(2, 0, 1).float()
-    
+
     return tensor_image.unsqueeze(0)
 
     
 
-def draw_boxes(image: Any, detections: List[Tuple[str, float, Tuple[int,int,int,int]]]) -> Any:
-    image_with_boxes = image.copy()
-    for label, confidence, box in detections:
-        x1, y1, x2, y2 = box
-        cv2.rectangle(image_with_boxes, (x1,y1 - 10), cv2.FONT_HERSHEY_SIMPLEX,
-                      0.5, (0, 255, 0), 2)
-        
-    return image_with_boxes
+def draw_boxes(
+    image: np.ndarray,
+    detections: List[Tuple[str, float, tuple[int, int, int, int]]],
+    show_labels: bool = True,
+    show_conf: bool = True,
+    box_color: Tuple[int, int, int] = (255, 0, 255),
+    text_color: Tuple[int, int, int, int] = (0, 0, 0),
+    box_thickness: int = 2,
+    font_scale: float = 0.5,
+    font_thicknes: int = 1
+) -> np.ndarray:
+    annotated_img = image.copy()
+
+    for label, confidence, (x1, y1, x2, y2) in detections:
+        cv2.rectangle(
+            annotated_img,
+            (x1, y1),
+            (x2, y2),
+            box_color,
+            box_thickness
+        )
+
+        if show_labels or show_conf:
+            text_parts = []
+            if show_labels:
+                text_parts.append(label)
+            if show_conf:
+                text_parts.append(f"{confidence:.2f}")
+            text = " ".join(text_parts)
+
+            (text_width, text_height), _ = cv2.getTextSize(
+                text,
+                cv2.FONT_HERSHEY_SIMPLEX,
+                font_scale,
+                font_thicknes
+            )
+
+            cv2.rectangle(
+                annotated_img,
+                (x1, y1 - text_height - 5),
+                (x1 + text_width, y1),
+                box_color,
+                -1
+            )
+
+            cv2.putText(
+                annotated_img,
+                text,
+                (x1, y1 - 5),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                font_scale,
+                text_color,
+                font_thicknes,
+                cv2.LINE_AA
+            )
+    return annotated_img
