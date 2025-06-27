@@ -48,10 +48,10 @@ def draw_boxes(
     show_labels: bool = True,
     show_conf: bool = True,
     box_color: Tuple[int, int, int] = (255, 0, 255),
-    text_color: Tuple[int, int, int, int] = (0, 0, 0),
+    text_color: Tuple[int, int, int] = (0, 0, 0),
     box_thickness: int = 2,
     font_scale: float = 0.5,
-    font_thicknes: int = 1
+    font_thickness: int = 1
 ) -> np.ndarray:
     annotated_img = image.copy()
 
@@ -76,7 +76,7 @@ def draw_boxes(
                 text,
                 cv2.FONT_HERSHEY_SIMPLEX,
                 font_scale,
-                font_thicknes
+                font_thickness
             )
 
             cv2.rectangle(
@@ -94,7 +94,7 @@ def draw_boxes(
                 cv2.FONT_HERSHEY_SIMPLEX,
                 font_scale,
                 text_color,
-                font_thicknes,
+                font_thickness,
                 cv2.LINE_AA
             )
     return annotated_img
@@ -128,9 +128,9 @@ def save_image(output_path: str, image: np.ndarray) -> None:
     Raises:
         ValueError: Si falla en guardar
     """
-    succes = cv2.imwrite(output_path, image)
-    if not succes:
-        raise ValueError(f"No se puedo fuardar la imagen en: {output_path}")
+    success = cv2.imwrite(output_path, image)
+    if not success:
+        raise ValueError(f"No se puedo guardar la imagen en: {output_path}")
     
 def load_image(image_path: str) -> np.ndarray:
     """
