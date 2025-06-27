@@ -132,3 +132,18 @@ def save_image(output_path: str, image: np.ndarray) -> None:
     if not succes:
         raise ValueError(f"No se puedo fuardar la imagen en: {output_path}")
     
+def load_image(image_path: str) -> np.ndarray:
+    """
+    Carga una imagen desde disco con validación.
+
+    Args:
+        image_path: Ruta a la imagen
+    
+    Returns:
+        Imagen en formato BGR (OpenCV)
+    """
+
+    img = cv2.imread(image_path)
+    if img is None:
+        raise FileNotFoundError(f"No se pudo cargar la imagen: {image_path}")
+    return img
