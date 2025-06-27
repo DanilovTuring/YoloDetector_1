@@ -72,16 +72,22 @@ class YOLOv5Detector (BaseDetector):
         """
        Dibuja las detecciones sobre la imagen original.
 
-       :param image: Es la imagen en formato OpenCv
-       :param detections: Lista de detecciones (clase, confianza, caja)
-       :return Imagen con cajas y etiquetas dibujadas. 
+       Args:
+            image: Imageen original (np.array)
+            detections: Lista de detecciones (label, confidence, bounding box)
+       
+        Returns:
+            Imagen con cajas y etiquetas dibujadas. 
         """
 
         if image is None:
             raise ValueError("Verifica la carga de la imagen")
         
-        annotated_image = draw_boxes(image.copy(), detections)
-        return annotated_image
+        if not detections:
+            return image.copy()
+        
+        return draw_boxes(image.copy(), detections)
+        
 
     def predict(self, image: Any ) -> List[Tuple[int, str, float, Tuple[int,int,int,int]]]:
    
