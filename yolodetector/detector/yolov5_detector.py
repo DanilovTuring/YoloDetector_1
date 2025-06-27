@@ -139,12 +139,12 @@ class YOLOv5Detector (BaseDetector):
     
     def __str__(self) -> str:
         """
-        Devuelve la representacion legible del lector
-        """    
-               
-        model_name = Path(MODEL_PATH).name
+         Representacion legible del detector
+        """     
+        model_name = Path(self.model.weigths.name if hasattr(self.model, 'weigths') else MODEL_PATH).name
         num_classes = len(self.model.names)
-        return f"YOLOv5DETECTOR(model='{model_name}', device = '{self.device}', classes={num_classes})"
+        return (f"YOLOv5DETECTOR(model='{model_name}', device = '{self.device}', " 
+                f"clases={num_classes}, conf_thresh={self.confidence_threshold})")
     
 
     
