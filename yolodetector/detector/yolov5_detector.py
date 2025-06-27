@@ -84,35 +84,51 @@ class YOLOv5Detector (BaseDetector):
     def predict(self, image: Any ) -> List[Tuple[int, str, float, Tuple[int,int,int,int]]]:
    
         """
-        Realiza la detección de objetos en una imagen usando el modelo YOLv5.
+        Realiza la predicción y filtra los resultados
 
-        param image; Imagen en formato OpenCV (numpy array)
-        :return: Lisra de tuplas con (clase_id, confianza, (x1,y1,x2,y2))
+        Args:
+            image: La imagen de entrada
+
+            Returns:
+                Lista de tu´las (class_id, label, confidence, bounding_box)
         """
 
-        #1. Preporcesar la imagen (resize y nomralización)
-        preprocessed = preprocess_image(image)
+        if isinstance(image, str): #Si es path carga la imagen
+            image = cv2.imread(image)
+            if image is None:
+                raise ValueError(f"No se pudo cargar la imagen  desde {image}")
 
-        #2. Realizar la inferencia con el modelo
-        results = self.model(preprocessed)[0]
-        
-        #3. Obtener las predicciones como DataFrame de pandas
-        detections = results[:, :6].cpu().numpy()
-        predictions = pd.DataFrame(results[0].cpu().numpy(), columns =
-                                   ["xmin", "ymin", "xmax", "ymax", "confidence", "class"])  # columnas: xmin, ymin, xmax, ymax, confidence, class, name
+        with torch.no_grad(): # desactiva gradientes para la inferencia
+            try:
+                results = self.model(image)
+            except Exception as e:
+                raise RuntimeError(f"Error durante la predicción {str(e)}")
 
-        #4. Convertir a lista de tuplas
+        #Extraer y filtrar detecciones
+        detections = results.xyxy[0].cpu().numpy()
         output = []
 
-        for _, row in predictions.iterrows():
-            class_id = int(row['class'])
-            confidence = float(row['confidence'])
-            box = (int(row['xmin']), int(row['ymin']), int(row['xmax']), int(row['ymax']))
-            name = self.model.names[class_id]
-            output.append((class_id, name, confidence, box))
+        for det in detections:
+            if len(det) >= 6:
+                xmin, ymin, xmax, ymax, conf, cls_id = det[:6]
 
-        return output 
-        
+                #Filtrar por confianza y convertir tipos
+                if conf < self.confidence_threshold:
+                    continue
+
+                try:
+                    cls_id = int(cls_id)
+                    conf = float(conf)
+                    label = self.model.names.get(cls_id, f"Unknown_{cls_id}")
+                    box = tuple(map(int,[xmin, ymin, conf, box]))
+                    output.append((cls_id, label, conf, box))
+
+
+                except Exception as e:
+                    print(f"Error procesando detección: {e}") 
+                    continue
+        return output
+    
     def __str__(self) -> str:
         """
         Devuelve la representacion legible del lector
