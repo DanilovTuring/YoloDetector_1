@@ -11,6 +11,8 @@ import numpy as np
 
 import pandas as pd
 
+from typing import Optional
+
 from yolodetector.detector.base import BaseDetector
 from yolodetector.config.setting import MODEL_PATH, DEVICE, CONFIDENCE_THRESHOLD
 from yolodetector.utils.image_utils import preprocess_image, draw_boxes
@@ -43,27 +45,27 @@ class YOLOv5Detector (BaseDetector):
 
  
 
-    def detect(self, image: Any) -> List[Tuple[str, float, Tuple[int, int, int, int ]]]:
+    def detect(self, image: Any, confidence_threshold: Optional[float] = None) -> List[Tuple[str, float, Tuple[int, int, int, int ]]]:
               
         """
-        Detecta objetos en una imagen y devuelve una lista con:
-        (nombre_clase, confianza, caja).
+        Detecta objetos en una imagen.
+
+        Args:
+            image: Imagen de entrada(nump array, path o tensor)
+            confidence_threshold: Umbral opcional para filtrar detecciones
+
+            
+        Returns:
+            Lista de tuplas (nombre_clase, confianza, )
         """
 
-        # 1. Obtener las predicciones crudas
+
+        if confidence_threshold is not None:
+            self.model.conf = confidence_threshold
+
         predictions = self.predict(image)
-
-        # 2. Obtener los nombres legibles de las clases
-        #(opc) class_names = self.model.names
-
-        # 3. traducir ids a nombres
-        results = []
-      
-        for class_id, confidence, box in predictions:
-            label = self.model.names[class_id]
-            results.append((label, confidence, box))
-
-        return results
+        return [(label, confidence, box) for _, label, confidence, box in predictions]
+        
          
     def draw_detections(self, image: Any, detections: List[Tuple[str, float, Tuple[int,int,int,int]]]) -> Any:
       
